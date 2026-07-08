@@ -9,6 +9,7 @@
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
+    "@netlify/vite-plugin-react-router": "^4.0.0",
     "@react-router/node": "7.15.1",
     "@react-router/serve": "7.15.1",
     "@tanstack/react-query": "^5.101.0",
