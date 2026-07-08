@@ -1,15 +1,17 @@
-import { tokenContext } from "~/context";
+import { tokenContext, userContext } from "~/context";
 import type { Route } from "../+types/home";
 import { getUsers } from "~/libs/radio.service";
 import { useLoaderData } from "react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { use, useState } from "react";
 import { createUser, deleteUser } from "~/libs/auth.service";
 import { queryClient } from "~/libs/queyClient";
+import { defaultkekoimg } from "~/config/containts";
 
 export async function loader({ context }: Route.LoaderArgs) {
   const token = context.get(tokenContext);
-  return { token };
+  const user = context.get(userContext);
+  return { token, user };
 }
 
 export default function UsersPage() {
@@ -18,9 +20,8 @@ export default function UsersPage() {
   const [limit, setLimit] = useState(10);
   const [username, setUsername] = useState("");
   const [schedule_title, setScheduleTitle] = useState("");
-  // const [role, setRole] = useState('');
   const [password, setPassword] = useState("");
-  const { token } = useLoaderData<typeof loader>();
+  const { token, user } = useLoaderData<typeof loader>();
   const { data, isLoading: isLoadingDataUsers } = useQuery({
     queryKey: ["users-data", page, limit],
     queryFn: () =>
@@ -34,7 +35,6 @@ export default function UsersPage() {
     setModal(false);
     setUsername("");
     setScheduleTitle("");
-    // setRole('');
     setPassword("");
   };
   const createdUserMutation = useMutation({
@@ -42,7 +42,6 @@ export default function UsersPage() {
       const data = {
         username,
         schedule_title,
-        // role,
         password,
       };
       if (token) {
@@ -64,18 +63,18 @@ export default function UsersPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users-data"] });
     },
-  })
+  });
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     createdUserMutation.mutate();
     setModal(false);
   };
   const handleDelete = async (id: string) => {
-    const res = confirm('¿Estas seguro que quieres borrar este usuario?');
+    const res = confirm("¿Estas seguro que quieres borrar este usuario?");
     if (res) {
-      deleteUserMutation.mutate(id)
+      deleteUserMutation.mutate(id);
     }
-  }
+  };
   function generarContraseña(longitud = 12) {
     const mayus = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const minus = "abcdefghijklmnopqrstuvwxyz";
@@ -88,11 +87,7 @@ export default function UsersPage() {
     }
 
     // Aseguramos al menos un carácter de cada tipo
-    let password = [
-      randomChar(mayus),
-      randomChar(minus),
-      randomChar(numeros),
-    ];
+    let password = [randomChar(mayus), randomChar(minus), randomChar(numeros)];
 
     for (let i = password.length; i < longitud; i++) {
       password.push(randomChar(todos));
@@ -130,6 +125,7 @@ export default function UsersPage() {
       <table className="table-fixed border-collapse border border-neutral-400 text-center bg-neutral-600">
         <thead>
           <tr>
+            <th>Avatar</th>
             <th>Nombre de usuario</th>
             <th>Activo</th>
             <th>Rol</th>
@@ -138,17 +134,37 @@ export default function UsersPage() {
         </thead>
         <tbody>
           {data?.data
-            ? data!.data.map((v) => (
-                <tr className="border border-neutral-400">
-                  <td>{v.username}</td>
-                  <td>{v.active === 1 ? "Si" : "No"}</td>
-                  <td>{v.role}</td>
-                  <td className="py-2">
-                    <button className="px-4 py-2 bg-green-700 rounded-2xl cursor-pointer hover:bg-green-600 disabled:bg-green-800 disabled:cursor-no-drop" disabled>Editar</button>
-                    <button onClick={() => handleDelete(v.id)} className="px-4 py-2 bg-red-500 rounded-2xl cursor-pointer hover:bg-red-600">Eliminar</button>
-                  </td>
-                </tr>
-              ))
+            ? data!.data
+                .filter((e) => e.id != user?.id)
+                .map((v) => (
+                  <tr className="border border-neutral-400">
+                    <td className="flex items-center justify-center">
+                      <div className="flex items-center justify-center h-20 w-20 overflow-hidden">
+                        <img
+                          src={v.figure_url ?? defaultkekoimg}
+                          alt={v.username}
+                        />
+                      </div>
+                    </td>
+                    <td>{v.username}</td>
+                    <td>{v.active === 1 ? "Si" : "No"}</td>
+                    <td>{v.role}</td>
+                    <td className="py-2">
+                      <button
+                        className="px-4 py-2 bg-green-700 rounded-2xl cursor-pointer hover:bg-green-600 disabled:bg-green-800 disabled:cursor-no-drop"
+                        disabled
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleDelete(v.id)}
+                        className="px-4 py-2 bg-red-500 rounded-2xl cursor-pointer hover:bg-red-600"
+                      >
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                ))
             : null}
         </tbody>
       </table>

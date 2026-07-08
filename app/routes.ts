@@ -12,12 +12,13 @@ export default [
     ]),
     ...prefix("panel", [
         route("login", "routes/panel/login.tsx"),
+        route("register", "routes/panel/register.tsx"),
         layout("./layouts/panel.layout.tsx", [
             route("home", "routes/panel/dashboard.tsx"),
             route("schedules", "routes/panel/schedules.tsx"),
             route("*", "routes/panel/not-found.tsx"),
             route("logout", "routes/panel/logout.tsx"),
             route("users", "routes/panel/users.tsx"),
-        ])
+        ]),
     ]),
 ] satisfies RouteConfig;

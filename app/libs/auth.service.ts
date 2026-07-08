@@ -54,3 +54,21 @@ export async function deleteUser(token: string, id: string): Promise<Response> {
   })
   return res;
 }
+
+export async function registerUser(body: UserRegisterDto): Promise<Response> {
+  const res = await fetch(`${BASE_API_URL}/api/auth/register`, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(body)
+  })
+
+  if (!res.ok) {
+    const errorBody = await res.json();
+    throw errorBody;
+  }
+
+  return res;
+}
