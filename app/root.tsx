@@ -9,6 +9,8 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./libs/queyClient";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -22,7 +24,17 @@ export const links: Route.LinksFunction = () => [
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
 ];
-
+// app/root.tsx
+export function HydrateFallback() {
+  return (
+    <div className="fixed inset-0 flex-col gap-4 w-full flex items-center justify-center">
+      <div className="w-20 h-20 border-4 border-transparent text-purple-700 text-4xl animate-spin flex items-center justify-center border-t-purple-400 rounded-full">
+        <div className="w-16 h-16 border-4 border-transparent text-purple-400 text-2xl animate-spin flex items-center justify-center border-t-purple-700 rounded-full"></div>
+      </div>
+      <p>Cargando web de HobbazFM</p>
+    </div>
+  );
+}
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -42,7 +54,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Outlet />
+    </QueryClientProvider>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

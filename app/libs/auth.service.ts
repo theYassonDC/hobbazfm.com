@@ -1,0 +1,56 @@
+import { BASE_API_URL } from "~/config/containts";
+import type { AuthLoginResponse } from "./interface/Auth.interface";
+
+export interface AuthProps {
+  username: string;
+  password: string;
+}
+export async function auth(body: AuthProps): Promise<AuthLoginResponse> {
+  const res = await fetch(`${BASE_API_URL}/api/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  const data = (await res.json()) as AuthLoginResponse
+  return data;
+}
+
+export async function authMe(token: string): Promise<Response> {
+  const res = await fetch(`${BASE_API_URL}/api/auth/me`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`
+    },
+  });
+  return res;
+}
+
+export async function createUser(token: string, body: UserDto): Promise<Response> {
+  const res = await fetch(`${BASE_API_URL}/api/users`, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(body)
+  })
+  return res;
+}
+
+export async function deleteUser(token: string, id: string): Promise<Response> {
+  const res = await fetch(`${BASE_API_URL}/api/users/${id}`, {
+    method: 'DELETE',
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`
+    },
+  })
+  return res;
+}
