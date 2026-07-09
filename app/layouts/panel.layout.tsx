@@ -85,7 +85,7 @@ export default function PanelLayout() {
           {navList.map((v) => (
             <>
               {v.roles?.includes(user!.role) ? (
-                <NavLink to={v.url}>
+                <NavLink to={v.url} discover="none">
                   {({ isActive, isPending, isTransitioning }) => (
                     <>
                       <p
