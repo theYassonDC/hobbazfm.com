@@ -4,7 +4,7 @@ import { defineConfig } from "vite";
 import netlifyReactRouter from "@netlify/vite-plugin-react-router";
 
 export default defineConfig({
-  plugins: [tailwindcss(), reactRouter(), netlifyReactRouter({ edge: true })],
+  plugins: [tailwindcss(), reactRouter(), netlifyReactRouter()],
   resolve: {
     tsconfigPaths: true,
   },
